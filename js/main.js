@@ -273,6 +273,61 @@ function openList(key) {
 // ---------- 編輯動作 ----------
 let dragSrcIdx = null;
 
+// 長按約 300ms 後才進入拖曳狀態，手指移動距離內若還沒到時間就當成正常捲動，
+// 不會擋掉清單的上下滑動
+function bindTouchReorder(row, list, bp) {
+  let holdTimer = null;
+  let dragging = false;
+  let startY = 0;
+
+  const cancelHold = () => clearTimeout(holdTimer);
+  const endDrag = () => {
+    dragging = false;
+    row.style.transform = '';
+    row.style.zIndex = '';
+    row.classList.remove('dragging');
+  };
+
+  row.addEventListener('touchstart', (e) => {
+    if (e.target.closest('.edit-row__archive')) return;
+    startY = e.touches[0].clientY;
+    holdTimer = setTimeout(() => {
+      dragging = true;
+      row.classList.add('dragging');
+      row.style.zIndex = '10';
+    }, 300);
+  }, { passive: true });
+
+  row.addEventListener('touchmove', (e) => {
+    if (!dragging) { cancelHold(); return; }
+    e.preventDefault();
+    row.style.transform = `translateY(${e.touches[0].clientY - startY}px)`;
+  }, { passive: false });
+
+  row.addEventListener('touchend', (e) => {
+    cancelHold();
+    if (!dragging) return;
+    const endY = e.changedTouches[0].clientY;
+    endDrag();
+
+    const rows = [...list.querySelectorAll('.edit-row')];
+    let targetIdx = +rows[rows.length - 1].dataset.idx;
+    for (const r of rows) {
+      const rect = r.getBoundingClientRect();
+      if (endY < rect.top + rect.height / 2) { targetIdx = +r.dataset.idx; break; }
+    }
+    const fromIdx = +row.dataset.idx;
+    if (targetIdx !== fromIdx) {
+      const [moved] = bp.exercises.splice(fromIdx, 1);
+      bp.exercises.splice(targetIdx, 0, moved);
+      saveState();
+    }
+    renderEdit();
+  });
+
+  row.addEventListener('touchcancel', () => { cancelHold(); endDrag(); });
+}
+
 function renderEdit() {
   const bp = BODY_PARTS.find((b) => b.key === activeKey);
 
@@ -285,6 +340,7 @@ function renderEdit() {
     </div>`).join('');
 
   list.querySelectorAll('.edit-row').forEach((row) => {
+    // 滑鼠拖曳（桌面）
     row.addEventListener('dragstart', () => {
       dragSrcIdx = +row.dataset.idx;
       row.classList.add('dragging');
@@ -301,6 +357,10 @@ function renderEdit() {
       saveState();
       renderEdit();
     });
+
+    // 觸控長按拖曳（手機）：HTML5 的 draggable 在觸控裝置上不會觸發，
+    // 沒有這段的話手機長按只會變成瀏覽器內建的選取文字/放大鏡選單
+    bindTouchReorder(row, list, bp);
   });
 
   list.querySelectorAll('.edit-row__archive').forEach((btn) => {
