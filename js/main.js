@@ -605,7 +605,7 @@ bodyFatInput.addEventListener('input', validateBodyForm);
 
 function renderBodyHistory() {
   const wrap = document.getElementById('bodyHistory');
-  const rows = [...WEIGHT_LOG].sort((a, b) => (a.date < b.date ? 1 : -1)).slice(0, 6);
+  const rows = [...WEIGHT_LOG].sort((a, b) => (a.date < b.date ? 1 : -1)).slice(0, 15);
   wrap.innerHTML = `<div class="body-history__label">歷史紀錄</div>` + rows.map((r) => `
     <div class="body-history-item">
       <span>${r.date}${r.date === TODAY ? '（今天）' : ''}</span>
