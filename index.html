@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>健身紀錄</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <link rel="icon" href="assets/icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="健身紀錄">
+  <meta name="theme-color" content="#0E1013">
+</head>
+<body>
+
+  <div class="phone-frame">
+    <div class="screens" id="screens">
+
+      <!-- A1 每日訓練 -->
+      <section class="screen" id="screen-home">
+        <div class="home-header">
+          <div class="home-header__title">每日訓練</div>
+          <label class="date-pill" for="homeDateInput">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 2v3M17 2v3M3.5 8.5h17M5 4h14a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"/></svg>
+            <input class="date-pill__input" id="homeDateInput" type="date">
+            <span class="date-pill__suffix" id="homeDateSuffix"></span>
+          </label>
+        </div>
+        <div class="part-grid" id="bodyPartGrid"></div>
+        <nav class="tab-bar">
+          <div class="tab-bar__item" data-tab="home">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6M2.5 10.5v3M7 7v10M20 9v6M21.5 10.5v3M17 7v10M7 12h10"/></svg>
+            訓練
+          </div>
+          <div class="tab-bar__item" data-tab="body">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M11 20V4M18 20v-7"/><path d="M2.5 20.5h19"/></svg>
+            身體組成
+          </div>
+          <div class="tab-bar__item" data-tab="export">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13M7 8l5-5 5 5"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+            輸出
+          </div>
+        </nav>
+        <div class="home-indicator"></div>
+      </section>
+
+      <!-- A2 身體組成 -->
+      <section class="screen" id="screen-body" style="display:none;">
+        <div class="home-header">
+          <div class="home-header__title">身體組成</div>
+          <label class="date-pill" for="bodyDateInput">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 2v3M17 2v3M3.5 8.5h17M5 4h14a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"/></svg>
+            <input class="date-pill__input" id="bodyDateInput" type="date">
+            <span class="date-pill__suffix" id="bodyDateSuffix"></span>
+          </label>
+        </div>
+        <div class="body-form">
+          <div class="field field--wide">
+            <span class="field__label">體重kgs</span>
+            <input class="field__input" id="bodyWeightInput" type="number" inputmode="decimal" placeholder="請輸入體重">
+          </div>
+          <div class="field field--wide">
+            <span class="field__label">體脂％</span>
+            <input class="field__input" id="bodyFatInput" type="number" inputmode="decimal" placeholder="請輸入體脂">
+          </div>
+          <button class="confirm-btn" id="bodySaveBtn" disabled>儲存</button>
+          <div class="body-history" id="bodyHistory"></div>
+        </div>
+        <nav class="tab-bar">
+          <div class="tab-bar__item" data-tab="home">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6M2.5 10.5v3M7 7v10M20 9v6M21.5 10.5v3M17 7v10M7 12h10"/></svg>
+            訓練
+          </div>
+          <div class="tab-bar__item" data-tab="body">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M11 20V4M18 20v-7"/><path d="M2.5 20.5h19"/></svg>
+            身體組成
+          </div>
+          <div class="tab-bar__item" data-tab="export">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13M7 8l5-5 5 5"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+            輸出
+          </div>
+        </nav>
+        <div class="home-indicator"></div>
+      </section>
+
+      <!-- A3 輸出 -->
+      <section class="screen" id="screen-export" style="display:none;">
+        <div class="home-header">
+          <div class="home-header__title">輸出</div>
+        </div>
+        <div class="export-body">
+          <div class="date-range-row">
+            <div class="field field--wide">
+              <span class="field__label">起日</span>
+              <input class="field__input" id="exportStartDate" type="date">
+            </div>
+            <div class="field field--wide">
+              <span class="field__label">迄日</span>
+              <input class="field__input" id="exportEndDate" type="date">
+            </div>
+          </div>
+          <div class="heatmap" id="heatmap"></div>
+          <button class="confirm-btn" id="exportBtn">輸出</button>
+        </div>
+        <nav class="tab-bar">
+          <div class="tab-bar__item" data-tab="home">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6M2.5 10.5v3M7 7v10M20 9v6M21.5 10.5v3M17 7v10M7 12h10"/></svg>
+            訓練
+          </div>
+          <div class="tab-bar__item" data-tab="body">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M11 20V4M18 20v-7"/><path d="M2.5 20.5h19"/></svg>
+            身體組成
+          </div>
+          <div class="tab-bar__item" data-tab="export">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13M7 8l5-5 5 5"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+            輸出
+          </div>
+        </nav>
+        <div class="home-indicator"></div>
+      </section>
+
+      <!-- A1.2 訓練動作 -->
+      <section class="screen screen--sub" id="screen-list">
+        <div class="top-nav">
+          <button class="top-nav__btn" id="listBack">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5 8 12l7 7"/></svg>
+          </button>
+          <div class="top-nav__title" id="listTitle">部位</div>
+          <button class="top-nav__btn" id="listEditBtn">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19.5 8.5a2.1 2.1 0 0 0-3-3L5 17v3Z"/></svg>
+          </button>
+        </div>
+        <div class="exercise-list" id="exerciseList"></div>
+      </section>
+
+      <!-- A1.2.1 編輯動作 -->
+      <section class="screen screen--sub" id="screen-edit">
+        <div class="top-nav">
+          <button class="top-nav__btn" id="editBack">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5 8 12l7 7"/></svg>
+          </button>
+          <div class="top-nav__title">編輯訓練動作</div>
+          <div class="top-nav__spacer"></div>
+        </div>
+        <div class="edit-body">
+          <div class="edit-list" id="editList"></div>
+          <button class="add-btn add-btn--wide" id="addExerciseBtn">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+            新增動作
+          </button>
+          <button class="archive-toggle" id="archiveToggle">
+            <span>過去封存動作</span>
+            <svg class="icon icon--chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <div class="archive-list" id="archiveList"></div>
+        </div>
+      </section>
+
+      <!-- A1.2.1.1 新增動作 -->
+      <section class="screen screen--sub" id="screen-add">
+        <div class="top-nav">
+          <button class="top-nav__btn" id="addClose">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+          </button>
+          <div class="top-nav__title">新增訓練動作</div>
+          <div class="top-nav__spacer"></div>
+        </div>
+        <div class="add-body">
+          <div class="field field--wide">
+            <span class="field__label">動作名稱</span>
+            <input class="field__input" id="addNameInput" type="text" placeholder="請輸入動作名稱" maxlength="15">
+          </div>
+          <p class="field-error" id="addNameError"></p>
+          <button class="confirm-btn" id="addConfirmBtn" disabled>確認</button>
+        </div>
+      </section>
+
+      <!-- A1.2.2 動作紀錄 -->
+      <section class="screen screen--sub" id="screen-record">
+        <div class="top-nav">
+          <button class="top-nav__btn" id="recordBack">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5 8 12l7 7"/></svg>
+          </button>
+          <div class="top-nav__title" id="recordTitle">動作</div>
+          <div class="top-nav__spacer"></div>
+        </div>
+
+        <!-- A1.2.2-1 倒數中：nav bar 下方橫向滿版區塊，不擋住下面元件操作 -->
+        <div class="countdown-bar" id="countdownBar">
+          <div class="countdown-bar__info">
+            <span class="countdown-bar__label">剩餘</span>
+            <span class="countdown-bar__time" id="countdownTime">0:00</span>
+          </div>
+          <button class="countdown-bar__cancel" id="countdownCancel">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+          </button>
+        </div>
+
+        <div class="record-body">
+          <div class="record-hint">
+            <button class="record-hint__btn" id="bringInBtn">帶入</button>
+          </div>
+          <div id="recordSets"></div>
+          <div class="field field--wide" style="margin-top: 20px;">
+            <span class="field__label">備註</span>
+            <input class="field__input" id="recordNote" type="text" placeholder="輸入額外備註" maxlength="50">
+          </div>
+          <div class="add-row">
+            <button class="add-btn" id="addGeneralSetBtn">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+              新增一般組
+            </button>
+            <button class="add-btn" id="addDropSetBtn">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+              新增降重組
+            </button>
+          </div>
+        </div>
+        <button class="timer-fab" id="timerFabBtn">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v5l3 2"/><circle cx="12" cy="13.5" r="8"/><path d="M9.5 2h5M12 2v2.5"/></svg>
+          計時
+        </button>
+
+        <!-- A1.2.2.1 休息計時 bottom sheet -->
+        <div class="sheet-overlay" id="timerSheetOverlay">
+          <div class="sheet">
+            <div class="sheet__header">
+              <span>休息倒數</span>
+              <button class="sheet__close" id="timerSheetClose">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+              </button>
+            </div>
+            <div class="sheet__options">
+              <button class="sheet__option" data-seconds="90">1 分 30 秒</button>
+              <button class="sheet__option" data-seconds="120">2 分 00 秒</button>
+              <button class="sheet__option" data-seconds="150">2 分 30 秒</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- A1.2.2-2 休息完成跳窗 -->
+        <div class="finish-overlay" id="finishOverlay">
+          <div class="finish-card">
+            <span class="finish-card__title">休息結束</span>
+            <button class="finish-card__confirm" id="finishConfirm">確認</button>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
