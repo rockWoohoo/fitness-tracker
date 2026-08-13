@@ -113,17 +113,43 @@ function seedBodyParts() {
   ];
 }
 
+// 來源：BodyComposition_202601-202608.csv（體脂機原始匯出）；同一天有多筆量測時，
+// 依 App 自己的儲存規則只留當天最後一筆（例如 2026-04-04 當天量了三次，取 23:44 那筆）
 function seedWeightLog() {
   return [
+    { date: '2026-03-08', weight: 79.7, bodyFat: 24.6 },
+    { date: '2026-03-23', weight: 82.2, bodyFat: 23.7 },
+    { date: '2026-03-26', weight: 82.0, bodyFat: 25.3 },
+    { date: '2026-03-30', weight: 79.5, bodyFat: 25.1 },
+    { date: '2026-04-02', weight: 80.5, bodyFat: 24.9 },
     { date: '2026-04-04', weight: 81.8, bodyFat: 24.7 },
+    { date: '2026-04-08', weight: 81.0, bodyFat: 24.6 },
+    { date: '2026-04-13', weight: 79.8, bodyFat: 23.9 },
+    { date: '2026-04-15', weight: 80.9, bodyFat: 21.5 },
+    { date: '2026-04-17', weight: 80.7, bodyFat: 23.3 },
+    { date: '2026-04-21', weight: 80.1, bodyFat: 24.2 },
+    { date: '2026-04-23', weight: 79.6, bodyFat: 24.3 },
+    { date: '2026-04-28', weight: 78.4, bodyFat: 23.9 },
+    { date: '2026-04-30', weight: 78.5, bodyFat: 24.1 },
     { date: '2026-05-01', weight: 77.8, bodyFat: 24.2 },
     { date: '2026-05-12', weight: 78.0, bodyFat: 22.7 },
-    { date: '2026-06-09', weight: 72.8, bodyFat: 22.7 },
-    { date: '2026-06-20', weight: 73.8, bodyFat: null },
-    { date: '2026-06-26', weight: 73.8, bodyFat: 21.3 },
+    { date: '2026-05-14', weight: 76.9, bodyFat: 22.9 },
+    { date: '2026-05-15', weight: 77.2, bodyFat: 23.0 },
+    { date: '2026-05-19', weight: 76.4, bodyFat: 22.3 },
+    { date: '2026-05-24', weight: 75.5, bodyFat: 23.1 },
+    { date: '2026-05-26', weight: 74.8, bodyFat: 23.4 },
+    { date: '2026-05-27', weight: 74.7, bodyFat: 23.1 },
+    { date: '2026-05-29', weight: 74.0, bodyFat: 22.6 },
+    { date: '2026-06-06', weight: 73.8, bodyFat: 22.8 },
+    { date: '2026-06-08', weight: 72.8, bodyFat: 22.7 },
+    { date: '2026-06-11', weight: 73.4, bodyFat: 22.4 },
+    { date: '2026-06-20', weight: 73.8, bodyFat: 21.3 },
+    { date: '2026-06-25', weight: 74.4, bodyFat: 21.4 },
     { date: '2026-07-05', weight: 72.6, bodyFat: 21.1 },
     { date: '2026-07-24', weight: 73.7, bodyFat: 20.9 },
-    { date: '2026-08-11', weight: 70.9, bodyFat: 20.6 },
+    { date: '2026-07-28', weight: 71.0, bodyFat: 21.2 },
+    { date: '2026-07-29', weight: 71.7, bodyFat: 20.9 },
+    { date: '2026-08-03', weight: 72.0, bodyFat: 20.6 },
   ];
 }
 
