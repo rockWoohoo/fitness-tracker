@@ -935,3 +935,59 @@ function pop() { if (stack.length > 1) stack.pop(); render(); }
 document.getElementById('listBack').addEventListener('click', pop);
 
 renderHome();
+
+// ---------- 下拉刷新 ----------
+// 加到主畫面後是獨立模式，沒有網址列可以下拉刷新；同時 PWA 常會把舊的 css/js 快取住，
+// 所以這裡刷新時直接連去掉快取版本一起重新拉取，不是單純 location.reload()
+(function setupPullToRefresh() {
+  const indicator = document.getElementById('pullRefresh');
+  const THRESHOLD = 60;
+  let startY = 0;
+  let pulling = false;
+  let refreshing = false;
+
+  function findScrollParent(el) {
+    while (el && el !== document.body) {
+      const style = getComputedStyle(el);
+      if ((style.overflowY === 'auto' || style.overflowY === 'scroll') && el.scrollHeight > el.clientHeight) return el;
+      el = el.parentElement;
+    }
+    return null;
+  }
+
+  document.addEventListener('touchstart', (e) => {
+    if (refreshing) return;
+    const scrollParent = findScrollParent(e.target);
+    if (scrollParent && scrollParent.scrollTop > 0) { pulling = false; return; }
+    startY = e.touches[0].clientY;
+    pulling = true;
+  }, { passive: true });
+
+  document.addEventListener('touchmove', (e) => {
+    if (!pulling || refreshing) return;
+    const deltaY = e.touches[0].clientY - startY;
+    if (deltaY <= 0) { indicator.style.transform = 'translateY(-60px)'; indicator.classList.remove('ready'); return; }
+    e.preventDefault();
+    const pull = Math.min(deltaY, 100);
+    indicator.style.transform = `translateY(${pull - 60}px)`;
+    indicator.classList.toggle('ready', pull > THRESHOLD);
+  }, { passive: false });
+
+  document.addEventListener('touchend', () => {
+    if (!pulling || refreshing) return;
+    pulling = false;
+    if (indicator.classList.contains('ready')) {
+      refreshing = true;
+      indicator.style.transform = 'translateY(0)';
+      indicator.classList.add('loading');
+      setTimeout(() => {
+        const url = new URL(location.href);
+        url.searchParams.set('r', Date.now());
+        location.replace(url.toString());
+      }, 400);
+    } else {
+      indicator.style.transform = 'translateY(-60px)';
+      indicator.classList.remove('ready');
+    }
+  });
+})();
