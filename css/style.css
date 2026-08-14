@@ -525,8 +525,8 @@ body {
   color: var(--accent);
   background: transparent;
   border-radius: var(--radius-sm);
-  padding: 13px;
-  font-size: 14px;
+  padding: 17px;
+  font-size: 18px;
   font-weight: 700;
 }
 
@@ -554,25 +554,25 @@ body {
 }
 .finish-overlay.show { display: flex; }
 .finish-card {
-  width: 240px;
+  width: 70%;
   background: #fff;
   border-radius: 18px;
-  padding: 28px 20px;
+  padding: 32px 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 20px;
 }
 .finish-card__title { font-size: 26px; font-weight: 800; color: #FF3B30; }
 .finish-card__confirm {
-  width: 100%;
+  width: 80%;
   border: none;
   border-radius: var(--radius-sm);
-  padding: 12px;
+  padding: 14px;
   background: var(--accent);
   color: #050607;
   font-weight: 700;
-  font-size: 14px;
+  font-size: 15px;
 }
 
 /* ---------- 身體組成 / 輸出 ---------- */

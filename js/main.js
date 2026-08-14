@@ -1,6 +1,6 @@
 // 健身紀錄 App
 // 資料來源：Rock 實際訓練紀錄（fitness_profile 記憶 2026-08-11 更新 + 訓練紀錄表 運動也是蠻爽ㄉ.xlsx）
-// 今天 2026-08-13 是週四，依訓練計畫「週一、四 = 胸+肩」
+// 種子資料裡「今天」的胸/肩紀錄只是示範用的假資料，實際會對應到打開網頁那天的日期
 //
 // 資料模型：每個動作有 history，用日期字串 (YYYY-MM-DD) 當 key 存當天的 SessionData，
 // 這樣「今天」「上次」都只是對 history 的查詢，日期欄位切換、輸出報表跨日彙整都建立在同一份資料上。
@@ -11,7 +11,11 @@ function uniformSets(count, reps, weight) {
   return Array.from({ length: count }, () => ({ reps, weight }));
 }
 
-const TODAY = '2026-08-13';
+function pad2(n) { return String(n).padStart(2, '0'); }
+function toISODate(d) { return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`; }
+
+// 裝置當天日期，不是寫死的字串——每次打開都會是真正的今天
+const TODAY = toISODate(new Date());
 
 // 種子資料：只在瀏覽器第一次開啟、還沒有存檔時使用；之後一律從 localStorage 讀取
 function seedBodyParts() {
@@ -695,8 +699,6 @@ function getAllTrainingDates() {
   return dates;
 }
 
-function pad2(n) { return String(n).padStart(2, '0'); }
-function toISODate(d) { return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`; }
 function addDaysISO(dateStr, delta) {
   const d = new Date(dateStr);
   d.setDate(d.getDate() + delta);
