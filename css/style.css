@@ -65,10 +65,14 @@ body {
 }
 
 @media (max-width: 480px) {
-  body { padding: 0; gap: 0; min-height: 100dvh; }
+  /* 用 100svh 不用 100dvh：dvh 在鍵盤跳出/收起時會即時變動，輸入框 blur 的那一刻
+     整個畫面高度跟著重新排版，手指還沒放開就已經換了佈局，導致點到別的元件（例如
+     編輯備註後偶爾跳回上一頁）。svh 是固定的「瀏覽器介面全開」高度，鍵盤只會蓋住內容，
+     不會讓畫面本身跟著鍵盤開合重排 */
+  body { padding: 0; gap: 0; min-height: 100svh; }
   .phone-frame {
     width: 100vw;
-    height: 100dvh;
+    height: 100svh;
     border-radius: 0;
     box-shadow: none;
   }
@@ -594,7 +598,7 @@ body {
   width: 80%;
   border: none;
   border-radius: var(--radius-sm);
-  padding: 14px;
+  padding: 37px 14px;
   background: var(--accent);
   color: #050607;
   font-weight: 700;

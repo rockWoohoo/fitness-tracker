@@ -515,10 +515,13 @@ function renderWorkingSession() {
   }
   document.getElementById('recordSets').innerHTML = html;
 
+  // WF 組數列表規則：填寫的次數與組數於 unfocus 後直接寫入資料庫，不用等到離開整個畫面
   document.querySelectorAll('#recordSets .set-row--general').forEach((row, i) => {
     const [repsInput, weightInput] = row.querySelectorAll('.field__input');
     repsInput.addEventListener('input', () => { workingSession.generalSets[i].reps = repsInput.value === '' ? null : Number(repsInput.value); });
     weightInput.addEventListener('input', () => { workingSession.generalSets[i].weight = weightInput.value === '' ? null : Number(weightInput.value); });
+    repsInput.addEventListener('blur', commitRecordToDate);
+    weightInput.addEventListener('blur', commitRecordToDate);
     bindLongPress(row, () => {
       if (workingSession.generalSets.length <= 1) { alert('至少需保留一組'); return; }
       if (!confirm('確定要刪除此組嗎？')) return;
@@ -530,6 +533,8 @@ function renderWorkingSession() {
     const [repsInput, weightInput] = row.querySelectorAll('.field__input');
     repsInput.addEventListener('input', () => { workingSession.dropSets[i].reps = repsInput.value === '' ? null : Number(repsInput.value); });
     weightInput.addEventListener('input', () => { workingSession.dropSets[i].weight = weightInput.value === '' ? null : Number(weightInput.value); });
+    repsInput.addEventListener('blur', commitRecordToDate);
+    weightInput.addEventListener('blur', commitRecordToDate);
     bindLongPress(row, () => {
       if (!confirm('確定要刪除此組嗎？')) return;
       workingSession.dropSets.splice(i, 1);
@@ -549,6 +554,7 @@ document.getElementById('addDropSetBtn').addEventListener('click', () => {
 
 const recordNoteInput = document.getElementById('recordNote');
 recordNoteInput.addEventListener('input', () => { workingSession.note = recordNoteInput.value; });
+recordNoteInput.addEventListener('blur', commitRecordToDate);
 
 function openRecord(key, idx) {
   const bp = BODY_PARTS.find((b) => b.key === key);
