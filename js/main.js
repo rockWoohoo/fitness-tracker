@@ -934,7 +934,7 @@ function setTab(tab) {
 document.querySelectorAll('.tab-bar__item').forEach((el) => {
   el.addEventListener('click', () => setTab(el.dataset.tab));
 });
-setTab('home');
+setTab(sessionStorage.getItem('activeTab') || 'home');
 
 // ---------- 畫面堆疊導航（動作清單／編輯／新增／紀錄，皆從首頁往下疊）----------
 const stack = ['home'];
@@ -996,6 +996,7 @@ renderHome();
       indicator.style.transform = 'translateY(0)';
       indicator.classList.add('loading');
       setTimeout(() => {
+        sessionStorage.setItem('activeTab', currentTab);
         const url = new URL(location.href);
         url.searchParams.set('r', Date.now());
         location.replace(url.toString());
