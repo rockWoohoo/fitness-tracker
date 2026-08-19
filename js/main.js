@@ -698,13 +698,6 @@ bodySaveBtn.addEventListener('click', () => {
 renderBodyHistory();
 
 // ---------- 輸出（A3）----------
-// 有訓練紀錄的日期，直接從所有動作的 history 統整出來，跟熱力圖、報表共用同一份真實資料
-function getAllTrainingDates() {
-  const dates = new Set();
-  BODY_PARTS.forEach((bp) => bp.exercises.forEach((ex) => Object.keys(ex.history).forEach((d) => dates.add(d))));
-  return dates;
-}
-
 function addDaysISO(dateStr, delta) {
   const d = new Date(dateStr);
   d.setDate(d.getDate() + delta);
@@ -712,17 +705,32 @@ function addDaysISO(dateStr, delta) {
 }
 function daysInMonth(y, m) { return new Date(y, m, 0).getDate(); }
 
-// 方塊顯示規則：當日有紀錄顯示綠色、無紀錄顯示灰色、尚未到來顯示白（透明）；
-// 年月從當下年月開始往下逐月顯示，這裡先呈現最近 3 個月（含本月）
+// 統計每一天實際訓練了幾個「不同部位」，用來區分單一部位／多部位的顯示顏色
+function getTrainingPartsPerDate() {
+  const map = new Map(); // dateStr -> Set(部位key)
+  BODY_PARTS.forEach((bp) => {
+    bp.exercises.forEach((ex) => {
+      Object.keys(ex.history).forEach((d) => {
+        if (!map.has(d)) map.set(d, new Set());
+        map.get(d).add(bp.key);
+      });
+    });
+  });
+  return map;
+}
+
+// 方塊顯示規則：多部位訓練顯示深綠、僅單一部位訓練顯示淺綠、無紀錄顯示灰色、尚未到來顯示白（透明）；
+// 月份當小標題，格子排在下方，固定一行14格（一個月會排成兩行多），往前呈現最近3個月
 function renderHeatmap() {
   const wrap = document.getElementById('heatmap');
-  const trainingDates = getAllTrainingDates();
+  const partsPerDate = getTrainingPartsPerDate();
   const today = new Date(TODAY);
   let y = today.getFullYear();
   let m = today.getMonth() + 1;
 
   let html = `<div class="heatmap-legend">
-    <span class="heatmap-legend__item"><span class="heatmap-legend__dot" style="background:var(--success)"></span>有訓練</span>
+    <span class="heatmap-legend__item"><span class="heatmap-legend__dot" style="background:var(--success)"></span>多部位訓練</span>
+    <span class="heatmap-legend__item"><span class="heatmap-legend__dot" style="background:var(--success-light)"></span>單一部位訓練</span>
     <span class="heatmap-legend__item"><span class="heatmap-legend__dot" style="background:#444B58"></span>無訓練</span>
   </div>`;
 
@@ -733,7 +741,8 @@ function renderHeatmap() {
       const dateStr = `${y}-${pad2(m)}-${pad2(d)}`;
       let cls = 'heatmap-cell--future';
       if (new Date(dateStr) <= today) {
-        cls = trainingDates.has(dateStr) ? 'heatmap-cell--done' : '';
+        const count = partsPerDate.get(dateStr)?.size || 0;
+        cls = count === 1 ? 'heatmap-cell--single' : count > 1 ? 'heatmap-cell--done' : '';
       }
       squares += `<span class="heatmap-cell ${cls}" title="${dateStr}"></span>`;
     }

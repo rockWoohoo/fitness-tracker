@@ -11,6 +11,7 @@
   --accent: #6E8BFF;
   --accent-dim: #6E8BFF33;
   --success: #4ADE80;
+  --success-light: #A7F3C0;
   --drop: #FBBF24;
   --radius-lg: 22px;
   --radius-md: 14px;
@@ -650,9 +651,10 @@ body {
   overflow-y: auto;
 }
 .heatmap-month__label { font-size: 12px; font-weight: 700; color: var(--text-dim); margin-bottom: 6px; }
-.heatmap-month__grid { display: flex; flex-wrap: wrap; gap: 3px; }
+.heatmap-month__grid { display: grid; grid-template-columns: repeat(14, 14px); gap: 3px; }
 .heatmap-cell { width: 14px; height: 14px; border-radius: 3px; background: #444B58; }
 .heatmap-cell--done { background: var(--success); }
+.heatmap-cell--single { background: var(--success-light); }
 .heatmap-cell--future { background: transparent; border: 1px solid var(--border); }
 
 .heatmap-legend { display: flex; align-items: center; gap: 14px; font-size: 11px; color: var(--text-faint); }
