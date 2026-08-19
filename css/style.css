@@ -647,8 +647,6 @@ body {
   display: flex;
   flex-direction: column;
   gap: 14px;
-  max-height: 230px;
-  overflow-y: auto;
 }
 .heatmap-month__label { font-size: 12px; font-weight: 700; color: var(--text-dim); margin-bottom: 6px; }
 .heatmap-month__grid { display: grid; grid-template-columns: repeat(14, 14px); gap: 3px; }
