@@ -114,6 +114,8 @@ function seedBodyParts() {
         { name: '下腹抬腿', history: { '2026-06-20': { generalSets: uniformSets(3, 24, null), dropSets: [], note: '自體重量，頂點腳垂直上抬' } } },
       ],
     },
+    // 「其他」：登山、籃球、羽球、勞力工作這類非重訓的額外運動，動作清單留空，由使用者自己新增
+    { key: 'other', name: '其他', color: 'gray', archived: [], exercises: [] },
   ];
 }
 
@@ -180,6 +182,13 @@ function loadState() {
 }
 loadState();
 
+// 既有使用者的 localStorage 資料是舊的，不會透過 seedBodyParts() 拿到新加的部位，
+// 這裡補一次性遷移：缺什麼固定部位就補上去，補完立刻存檔，之後不會再重複觸發
+if (!BODY_PARTS.some((bp) => bp.key === 'other')) {
+  BODY_PARTS.push({ key: 'other', name: '其他', color: 'gray', archived: [], exercises: [] });
+  saveState();
+}
+
 const DEFAULT_GENERAL_SETS = 4;
 const SET_LABELS = '一二三四五六七八九十';
 
@@ -195,6 +204,7 @@ const ICONS = {
   arm: '<path d="M5 19l5-5c2-2 2-5 0-7"/><circle cx="15" cy="7" r="2.3"/>',
   leg: '<path d="M10 4v9l-3 7"/><path d="M14 4v9l3 7"/>',
   abs: '<rect x="8" y="4.5" width="3.4" height="4" rx="1"/><rect x="12.6" y="4.5" width="3.4" height="4" rx="1"/><rect x="8" y="10" width="3.4" height="4" rx="1"/><rect x="12.6" y="10" width="3.4" height="4" rx="1"/><rect x="8" y="15.5" width="3.4" height="4" rx="1"/><rect x="12.6" y="15.5" width="3.4" height="4" rx="1"/>',
+  other: '<path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/>',
   chart: '<path d="M4 20V10M11 20V4M18 20v-7"/><path d="M2.5 20.5h19"/>',
   export: '<path d="M12 3v13M7 8l5-5 5 5"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/>',
   archive: '<path d="M4 4h16l-1.2 3H5.2Z"/><path d="M5 7v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V7"/><path d="M9.5 11.5h5"/>',

@@ -23,6 +23,7 @@
   --c-pink: #F472B6;
   --c-teal: #2DD4BF;
   --c-green: #4ADE80;
+  --c-gray: #9CA3AF;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -218,6 +219,7 @@ body {
 .part-card--pink .part-card__icon    { background: color-mix(in srgb, var(--c-pink) 18%, transparent);   color: var(--c-pink); }
 .part-card--teal .part-card__icon    { background: color-mix(in srgb, var(--c-teal) 18%, transparent);   color: var(--c-teal); }
 .part-card--green .part-card__icon   { background: color-mix(in srgb, var(--c-green) 18%, transparent);  color: var(--c-green); }
+.part-card--gray .part-card__icon    { background: color-mix(in srgb, var(--c-gray) 18%, transparent);   color: var(--c-gray); }
 
 /* ---------- Tab bar ---------- */
 .tab-bar {
