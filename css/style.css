@@ -649,8 +649,8 @@ body {
   gap: 14px;
 }
 .heatmap-month__label { font-size: 12px; font-weight: 700; color: var(--text-dim); margin-bottom: 6px; }
-.heatmap-month__grid { display: grid; grid-template-columns: repeat(14, 14px); gap: 3px; }
-.heatmap-cell { width: 14px; height: 14px; border-radius: 3px; background: #444B58; }
+.heatmap-month__grid { display: grid; grid-template-columns: repeat(14, 1fr); gap: 3px; }
+.heatmap-cell { width: 100%; aspect-ratio: 1; border-radius: 3px; background: #444B58; }
 .heatmap-cell--done { background: var(--success); }
 .heatmap-cell--single { background: var(--success-light); }
 .heatmap-cell--future { background: transparent; border: 1px solid var(--border); }
