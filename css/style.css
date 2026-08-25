@@ -277,6 +277,20 @@ body {
   font-weight: 700;
 }
 .top-nav__spacer { width: 36px; }
+.top-nav__action {
+  height: 36px;
+  padding: 0 4px;
+  display: flex;
+  align-items: center;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--accent);
+  white-space: nowrap;
+}
+.top-nav__action--disabled {
+  color: var(--text-faint);
+  pointer-events: none;
+}
 
 /* ---------- Exercise list ---------- */
 .exercise-list {
@@ -308,21 +322,6 @@ body {
   overflow-y: auto;
   flex: 1;
 }
-.record-hint {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 6px;
-}
-.record-hint__btn {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--accent);
-}
-.record-hint__btn--disabled {
-  color: var(--text-faint);
-  pointer-events: none;
-}
-
 .set-row {
   display: grid;
   grid-template-columns: 60px 1fr 1fr;

@@ -578,7 +578,7 @@ function openRecord(key, idx) {
   recordNoteInput.value = workingSession.note;
 
   const bringInBtn = document.getElementById('bringInBtn');
-  bringInBtn.classList.toggle('record-hint__btn--disabled', !getPreviousSession(ex, viewDate));
+  bringInBtn.classList.toggle('top-nav__action--disabled', !getPreviousSession(ex, viewDate));
 
   push('record');
 }
