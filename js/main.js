@@ -164,9 +164,11 @@ const WEIGHT_LOG = seedWeightLog();
 
 // ---------- 資料持久化（localStorage）----------
 const STORAGE_KEY = 'fitness-tracker-v1';
+const SYNCED_AT_KEY = 'fitness-tracker-v1-syncedAt';
 
 function saveState() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify({ bodyParts: BODY_PARTS, weightLog: WEIGHT_LOG }));
+  syncToCloud();
 }
 
 function loadState() {
@@ -181,6 +183,60 @@ function loadState() {
   }
 }
 loadState();
+
+// ---------- 雲端同步（Supabase）----------
+// 本機 localStorage 永遠是主要來源，開啟 App 一律先用本機資料立即顯示；
+// 雲端只用來做「換裝置/App 資料遺失時的還原」跟「讓 Claude 直接讀取資料討論」，
+// 離線或雲端異常時同步會靜默失敗，不影響本機操作。
+const SUPABASE_URL = 'https://xwsrfxqiukphcwxolhag.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh3c3JmeHFpdWtwaGN3eG9saGFnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg0MjAyMDIsImV4cCI6MjEwMzk5NjIwMn0.3boQzY9eDOvqIRd9fHpbOgj68sCKR2iBL65ORYQym6U';
+const supabaseClient = window.supabase
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  : null;
+
+async function syncToCloud() {
+  if (!supabaseClient) return;
+  try {
+    const now = new Date().toISOString();
+    const { error } = await supabaseClient.from('fitness_data').upsert({
+      id: 'main',
+      data: { bodyParts: BODY_PARTS, weightLog: WEIGHT_LOG },
+      updated_at: now,
+    });
+    if (!error) localStorage.setItem(SYNCED_AT_KEY, String(Date.parse(now)));
+  } catch (e) {
+    // 離線或雲端異常，本機資料已經寫入 localStorage，之後下次存檔會再試一次
+  }
+}
+
+async function pullFromCloud() {
+  if (!supabaseClient) return;
+  try {
+    const localTime = Number(localStorage.getItem(SYNCED_AT_KEY) || 0);
+
+    // 這台裝置從沒同步過：如果本機本來就有資料（例如既有手機上的真實紀錄），
+    // 本機才是最新真相，先推上雲端，不能反過來被雲端舊資料蓋掉本機；
+    // 只有本機真的是空的（例如全新裝置）才會走下面的邏輯去抓雲端資料回來
+    if (!localTime && localStorage.getItem(STORAGE_KEY) !== null) {
+      await syncToCloud();
+      return;
+    }
+
+    const { data: row, error } = await supabaseClient
+      .from('fitness_data').select('data, updated_at').eq('id', 'main').maybeSingle();
+    if (error || !row) return;
+    const cloudTime = Date.parse(row.updated_at);
+    if (cloudTime > localTime && row.data) {
+      if (Array.isArray(row.data.bodyParts)) BODY_PARTS.splice(0, BODY_PARTS.length, ...row.data.bodyParts);
+      if (Array.isArray(row.data.weightLog)) WEIGHT_LOG.splice(0, WEIGHT_LOG.length, ...row.data.weightLog);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ bodyParts: BODY_PARTS, weightLog: WEIGHT_LOG }));
+      localStorage.setItem(SYNCED_AT_KEY, String(cloudTime));
+      renderHome();
+    }
+  } catch (e) {
+    // 抓不到雲端資料就沿用本機，不擋住使用
+  }
+}
 
 // 既有使用者的 localStorage 資料是舊的，不會透過 seedBodyParts() 拿到新加的部位，
 // 這裡補一次性遷移：缺什麼固定部位就補上去，補完立刻存檔，之後不會再重複觸發
@@ -960,6 +1016,7 @@ function pop() { if (stack.length > 1) stack.pop(); render(); }
 document.getElementById('listBack').addEventListener('click', pop);
 
 renderHome();
+pullFromCloud();
 
 // ---------- 下拉刷新 ----------
 // 加到主畫面後是獨立模式，沒有網址列可以下拉刷新；同時 PWA 常會把舊的 css/js 快取住，
