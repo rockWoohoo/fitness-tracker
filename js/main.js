@@ -164,10 +164,11 @@ const WEIGHT_LOG = seedWeightLog();
 
 // A4 特殊紀錄：固定四個項目（WF：無編輯選項）；SPECIAL_LOG 以日期為 key，存當天勾選的項目 key
 const SPECIAL_ITEMS = [
-  { key: 'alcohol', name: '飲酒', desc: '超過 6 支 550 ml 啤酒' },
+  { key: 'alcohol', name: '飲酒', desc: '超過 3 支 550 ml 啤酒' },
   { key: 'lowCalorie', name: '低熱量飲食', desc: '進食量不足 1,000 大卡' },
-  { key: 'dining', name: '聚餐', desc: '熱量超過每日上限' },
+  { key: 'dining', name: '聚餐', desc: '重油重鹹、高熱量食物' },
   { key: 'sickInjury', name: '生病或受傷', desc: '無法至健身房' },
+  { key: 'lateNight', name: '熬夜', desc: '睡眠不足 6 小時' },
 ];
 const SPECIAL_LOG = {};
 
