@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>健身紀錄</title>
-  <link rel="stylesheet" href="css/style.css?v=10">
+  <link rel="stylesheet" href="css/style.css?v=11">
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <link rel="icon" href="assets/icon-192.png">
@@ -179,6 +179,18 @@
         </div>
       </section>
 
+      <!-- A4 特殊紀錄 -->
+      <section class="screen screen--sub" id="screen-special">
+        <div class="top-nav">
+          <button class="top-nav__btn" id="specialBack">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5 8 12l7 7"/></svg>
+          </button>
+          <div class="top-nav__title">特殊紀錄</div>
+          <div class="top-nav__spacer"></div>
+        </div>
+        <div class="exercise-list" id="specialList"></div>
+      </section>
+
       <!-- A1.2.2 動作紀錄 -->
       <section class="screen screen--sub" id="screen-record">
         <div class="top-nav">
@@ -252,6 +264,6 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/main.js?v=10"></script>
+  <script src="js/main.js?v=11"></script>
 </body>
 </html>

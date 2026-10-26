@@ -5,7 +5,7 @@
 // 資料模型：每個動作有 history，用日期字串 (YYYY-MM-DD) 當 key 存當天的 SessionData，
 // 這樣「今天」「上次」都只是對 history 的查詢，日期欄位切換、輸出報表跨日彙整都建立在同一份資料上。
 // SessionData 結構：{ generalSets:[{reps,weight}], dropSets:[{reps,weight,note?}], note }
-// 整份 BODY_PARTS + WEIGHT_LOG 會存進 localStorage，重新整理頁面不會遺失。
+// 整份 BODY_PARTS + WEIGHT_LOG + SPECIAL_LOG 會存進 localStorage，重新整理頁面不會遺失。
 
 function uniformSets(count, reps, weight) {
   return Array.from({ length: count }, () => ({ reps, weight }));
@@ -162,12 +162,35 @@ function seedWeightLog() {
 const BODY_PARTS = seedBodyParts();
 const WEIGHT_LOG = seedWeightLog();
 
+// A4 特殊紀錄：固定四個項目（WF：無編輯選項）；SPECIAL_LOG 以日期為 key，存當天勾選的項目 key
+const SPECIAL_ITEMS = [
+  { key: 'alcohol', name: '飲酒', desc: '超過 6 支 550 ml 啤酒' },
+  { key: 'lowCalorie', name: '低熱量飲食', desc: '進食量不足 1,000 大卡' },
+  { key: 'dining', name: '聚餐', desc: '熱量超過每日上限' },
+  { key: 'sickInjury', name: '生病或受傷', desc: '無法至健身房' },
+];
+const SPECIAL_LOG = {};
+
 // ---------- 資料持久化（localStorage）----------
 const STORAGE_KEY = 'fitness-tracker-v1';
 const SYNCED_AT_KEY = 'fitness-tracker-v1-syncedAt';
 
+function snapshotState() {
+  return { bodyParts: BODY_PARTS, weightLog: WEIGHT_LOG, specialLog: SPECIAL_LOG };
+}
+
+// 舊存檔／舊雲端資料沒有 specialLog 欄位時，保留現有的，不會被清空
+function applyState(data) {
+  if (Array.isArray(data.bodyParts)) BODY_PARTS.splice(0, BODY_PARTS.length, ...data.bodyParts);
+  if (Array.isArray(data.weightLog)) WEIGHT_LOG.splice(0, WEIGHT_LOG.length, ...data.weightLog);
+  if (data.specialLog && typeof data.specialLog === 'object' && !Array.isArray(data.specialLog)) {
+    Object.keys(SPECIAL_LOG).forEach((d) => delete SPECIAL_LOG[d]);
+    Object.assign(SPECIAL_LOG, data.specialLog);
+  }
+}
+
 function saveState() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({ bodyParts: BODY_PARTS, weightLog: WEIGHT_LOG }));
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshotState()));
   syncToCloud();
 }
 
@@ -175,9 +198,7 @@ function loadState() {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (!raw) return;
   try {
-    const data = JSON.parse(raw);
-    if (Array.isArray(data.bodyParts)) BODY_PARTS.splice(0, BODY_PARTS.length, ...data.bodyParts);
-    if (Array.isArray(data.weightLog)) WEIGHT_LOG.splice(0, WEIGHT_LOG.length, ...data.weightLog);
+    applyState(JSON.parse(raw));
   } catch (e) {
     // 存檔壞掉就沿用種子資料，不讓整個 App 掛掉
   }
@@ -200,7 +221,7 @@ async function syncToCloud() {
     const now = new Date().toISOString();
     const { error } = await supabaseClient.from('fitness_data').upsert({
       id: 'main',
-      data: { bodyParts: BODY_PARTS, weightLog: WEIGHT_LOG },
+      data: snapshotState(),
       updated_at: now,
     });
     if (!error) localStorage.setItem(SYNCED_AT_KEY, String(Date.parse(now)));
@@ -227,9 +248,8 @@ async function pullFromCloud() {
     if (error || !row) return;
     const cloudTime = Date.parse(row.updated_at);
     if (cloudTime > localTime && row.data) {
-      if (Array.isArray(row.data.bodyParts)) BODY_PARTS.splice(0, BODY_PARTS.length, ...row.data.bodyParts);
-      if (Array.isArray(row.data.weightLog)) WEIGHT_LOG.splice(0, WEIGHT_LOG.length, ...row.data.weightLog);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ bodyParts: BODY_PARTS, weightLog: WEIGHT_LOG }));
+      applyState(row.data);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshotState()));
       localStorage.setItem(SYNCED_AT_KEY, String(cloudTime));
       renderHome();
     }
@@ -261,6 +281,7 @@ const ICONS = {
   leg: '<path d="M10 4v9l-3 7"/><path d="M14 4v9l3 7"/>',
   abs: '<rect x="8" y="4.5" width="3.4" height="4" rx="1"/><rect x="12.6" y="4.5" width="3.4" height="4" rx="1"/><rect x="8" y="10" width="3.4" height="4" rx="1"/><rect x="12.6" y="10" width="3.4" height="4" rx="1"/><rect x="8" y="15.5" width="3.4" height="4" rx="1"/><rect x="12.6" y="15.5" width="3.4" height="4" rx="1"/>',
   other: '<path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/>',
+  special: '<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2Z"/>',
   chart: '<path d="M4 20V10M11 20V4M18 20v-7"/><path d="M2.5 20.5h19"/>',
   export: '<path d="M12 3v13M7 8l5-5 5 5"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/>',
   archive: '<path d="M4 4h16l-1.2 3H5.2Z"/><path d="M5 7v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V7"/><path d="M9.5 11.5h5"/>',
@@ -308,10 +329,48 @@ function renderHome() {
       <span class="part-card__name">${bp.name}</span>
     </button>
   `;
-  }).join('');
+  }).join('') + `
+    <button class="part-card part-card--orange" data-special="1">
+      <span class="part-card__icon">${icon('special')}</span>
+      <span class="part-card__name">特殊紀錄</span>
+    </button>`;
   grid.querySelectorAll('.part-card').forEach((el) => {
-    el.addEventListener('click', () => openList(el.dataset.key));
+    el.addEventListener('click', () => (el.dataset.special ? openSpecial() : openList(el.dataset.key)));
   });
+}
+
+// ---------- 特殊紀錄（A4）：勾選或取消勾選當下就存檔，跟著首頁選的日期走 ----------
+function renderSpecial() {
+  const checked = SPECIAL_LOG[viewDate] || [];
+  const wrap = document.getElementById('specialList');
+  wrap.innerHTML = SPECIAL_ITEMS.map((item) => {
+    const on = checked.includes(item.key);
+    return `
+    <button class="exercise-card special-card" data-key="${item.key}" aria-pressed="${on}">
+      <span class="special-card__text">
+        <span class="special-card__name">${item.name}</span>
+        <span class="special-card__desc">${item.desc}</span>
+      </span>
+      <span class="special-card__check${on ? ' special-card__check--on' : ''}">${icon('check')}</span>
+    </button>`;
+  }).join('');
+  wrap.querySelectorAll('.special-card').forEach((el) => {
+    el.addEventListener('click', () => toggleSpecial(el.dataset.key));
+  });
+}
+
+function toggleSpecial(key) {
+  const list = SPECIAL_LOG[viewDate] || [];
+  const next = list.includes(key) ? list.filter((k) => k !== key) : [...list, key];
+  if (next.length) SPECIAL_LOG[viewDate] = next;
+  else delete SPECIAL_LOG[viewDate];
+  saveState();
+  renderSpecial();
+}
+
+function openSpecial() {
+  renderSpecial();
+  push('special');
 }
 
 // ---------- 動作清單 ----------
@@ -1014,6 +1073,7 @@ function push(screen) { stack.push(screen); render(); }
 function pop() { if (stack.length > 1) stack.pop(); render(); }
 
 document.getElementById('listBack').addEventListener('click', pop);
+document.getElementById('specialBack').addEventListener('click', pop);
 
 renderHome();
 pullFromCloud();

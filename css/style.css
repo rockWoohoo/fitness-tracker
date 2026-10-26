@@ -24,6 +24,7 @@
   --c-teal: #2DD4BF;
   --c-green: #4ADE80;
   --c-gray: #9CA3AF;
+  --c-orange: #FB923C;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -220,6 +221,7 @@ body {
 .part-card--teal .part-card__icon    { background: color-mix(in srgb, var(--c-teal) 18%, transparent);   color: var(--c-teal); }
 .part-card--green .part-card__icon   { background: color-mix(in srgb, var(--c-green) 18%, transparent);  color: var(--c-green); }
 .part-card--gray .part-card__icon    { background: color-mix(in srgb, var(--c-gray) 18%, transparent);   color: var(--c-gray); }
+.part-card--orange .part-card__icon  { background: color-mix(in srgb, var(--c-orange) 18%, transparent); color: var(--c-orange); }
 
 /* ---------- Tab bar ---------- */
 .tab-bar {
@@ -315,6 +317,25 @@ body {
 .exercise-card__name { font-size: 15px; font-weight: 600; color: var(--text); }
 .exercise-card__weight { font-size: 13px; font-weight: 600; color: var(--accent); font-variant-numeric: tabular-nums; }
 .exercise-card__weight--empty { color: var(--text-faint); font-weight: 500; }
+
+/* ---------- Special records（沿用 exercise-card 外框，只補文字堆疊跟勾選圓圈）---------- */
+.special-card { gap: 12px; }
+.special-card__text { display: flex; flex-direction: column; gap: 6px; }
+.special-card__name { font-size: 16px; font-weight: 700; color: var(--text); }
+.special-card__desc { font-size: 13px; color: var(--text-dim); }
+.special-card__check {
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 1.5px solid var(--text-faint);
+  color: var(--text-faint);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.special-card__check .icon { width: 14px; height: 14px; stroke-width: 2.5; }
+.special-card__check--on { background: var(--success); border-color: var(--success); color: #050607; }
 
 /* ---------- Record screen ---------- */
 .record-body {
