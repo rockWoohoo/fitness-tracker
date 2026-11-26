@@ -732,8 +732,10 @@ document.getElementById('recordBack').addEventListener('click', () => {
 });
 
 // ---------- 休息計時 ----------
+// 用「結束時間點」推算剩餘秒數：切到其他 App 時 iOS 會凍結 JS，逐秒遞減會停住；
+// 結束時間存 localStorage，App 被系統關掉重開也接得回來
+const TIMER_END_KEY = 'fitness-tracker-timer-end';
 let timerInterval = null;
-let timerSeconds = 0;
 
 function formatTime(s) {
   const m = Math.floor(s / 60);
@@ -752,22 +754,43 @@ document.getElementById('timerSheetOverlay').addEventListener('click', (e) => {
 
 // 倒數是 nav bar 下方的橫向區塊，不是遮罩，畫面上其他元件（組數輸入、備註、
 // 返回、帶入…）全程都還能正常操作；休息結束則維持滿版遮罩，要按確認才關掉
-function startCountdown(seconds) {
-  timerSeconds = seconds;
-  document.getElementById('countdownTime').textContent = formatTime(timerSeconds);
+function finishCountdown() {
+  clearInterval(timerInterval);
+  localStorage.removeItem(TIMER_END_KEY);
+  document.getElementById('countdownBar').classList.remove('show');
+  document.getElementById('finishOverlay').classList.add('show');
+}
+
+function tickCountdown() {
+  const endAt = Number(localStorage.getItem(TIMER_END_KEY));
+  if (!endAt) return;
+  const remaining = Math.ceil((endAt - Date.now()) / 1000);
+  if (remaining <= 0) {
+    finishCountdown();
+    return;
+  }
+  document.getElementById('countdownTime').textContent = formatTime(remaining);
+}
+
+// 有進行中的計時才啟動畫面更新；開始、回到 App、重新開啟都走這裡
+function runCountdown() {
+  if (!localStorage.getItem(TIMER_END_KEY)) return;
   document.getElementById('countdownBar').classList.add('show');
   clearInterval(timerInterval);
-  timerInterval = setInterval(() => {
-    timerSeconds -= 1;
-    if (timerSeconds <= 0) {
-      clearInterval(timerInterval);
-      document.getElementById('countdownBar').classList.remove('show');
-      document.getElementById('finishOverlay').classList.add('show');
-      return;
-    }
-    document.getElementById('countdownTime').textContent = formatTime(timerSeconds);
-  }, 1000);
+  timerInterval = setInterval(tickCountdown, 250);
+  tickCountdown();
 }
+
+function startCountdown(seconds) {
+  localStorage.setItem(TIMER_END_KEY, String(Date.now() + seconds * 1000));
+  document.getElementById('finishOverlay').classList.remove('show');
+  runCountdown();
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') runCountdown();
+});
+runCountdown();
 
 document.querySelectorAll('.sheet__option').forEach((btn) => {
   btn.addEventListener('click', () => {
@@ -778,11 +801,7 @@ document.querySelectorAll('.sheet__option').forEach((btn) => {
 });
 
 // WF 取消說明：點擊則直接進入倒數完成狀態
-document.getElementById('countdownCancel').addEventListener('click', () => {
-  clearInterval(timerInterval);
-  document.getElementById('countdownBar').classList.remove('show');
-  document.getElementById('finishOverlay').classList.add('show');
-});
+document.getElementById('countdownCancel').addEventListener('click', finishCountdown);
 document.getElementById('finishConfirm').addEventListener('click', () => {
   document.getElementById('finishOverlay').classList.remove('show');
 });
